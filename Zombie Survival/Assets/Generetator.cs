@@ -4,20 +4,16 @@ using UnityEngine;
 
 public class Generetator : MonoBehaviour
 {
-    Heroe ero = new Heroe();
-    Zombie zombie = new Zombie();
-    Aldeano aldeano = new Aldeano();
-    string[] nombres = new string[] { "Carlos", "Sebastian", "Eduardo", "Daniel", "Cata",
-                                      "Danilo" , "Felipe" , "Tatiana" , "Juan" ,"Ronald" ,
-                                      "Geremias" , "Rene" , "Eugenia" , "Eulari" , "Gala" ,
-                                      "Gurtza" , "Gudula" , "Hebe" , "Fara", "Fedora"};
-    public float veloc;
+    Heroe hero;
     public string Clor;
     // Start is called before the first frame update
     void Start()
     {
-        ero.hero = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        ero.hero.AddComponent<Camera>();
+        hero = new Heroe(new GameObject());
+        string[] nombres = new string[] { "Carlos", "Sebastian", "Eduardo", "Daniel", "Cata",
+                                      "Danilo" , "Felipe" , "Tatiana" , "Juan" ,"Ronald" ,
+                                      "Geremias" , "Rene" , "Eugenia" , "Eulari" , "Gala" ,
+                                      "Gurtza" , "Gudula" , "Hebe" , "Fara", "Fedora"};
         int Zrnd;
         Zrnd = Random.Range(4,9);
         for(int i = 0; i < Zrnd;i++)
@@ -35,70 +31,70 @@ public class Generetator : MonoBehaviour
             {
                 Clor = "Verde";
             }
-            zombie.sombie(Clor);
+
+            new Zombie(Clor);
+
         }
         int Alde = 9 - Zrnd;
         for(int i = 0; i < Alde; i++)
         {
             int nrnd = Random.Range(0, 20);
             int ernd = Random.Range(15, 101);
-            aldeano.Aldea(nombres[nrnd], ernd);
+            new Aldeano(nombres[nrnd], ernd);
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        ero.hero.transform.Translate(0, 0, ero.Movimiento(veloc));
-        ero.hero.transform.Rotate(0,ero.Rota(veloc * 5),0,0);
+        hero.Movimiento();
     } 
 }
+
 /// <summary>
 /// Se genera gran parte las estancias del lo jugable
 /// </summary>
 public class Heroe
-{   
-    public GameObject hero;
+{
+    Transform movHero;
+  
     /// <summary>
-    /// Se le pone la velocidad en la quiere ir el jugador y se procede con el mismo movimiento
+    /// la creacion de su heroe y la adiccion de los componentes
     /// </summary>
-    /// <param name="vel">
-    /// Se le pone una velocidad en float
+    /// <param name="heroe">
+    /// Se le procede una creacion de objeto
     /// </param>
-    /// <returns></returns>
-    public float Movimiento(float vel)
+    public Heroe(GameObject heroe)
     {
-        float ind = 0;
+        heroe = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        movHero = heroe.transform;
+        heroe.AddComponent<Camera>();
+    }
+    /// <summary>
+    /// Se le pone la velocidad en la quiere ir el jugador, se procede con el mismo movimiento
+    /// y la rotacion
+    /// </summary>
+    public void Movimiento()
+    {
         if (Input.GetKey(KeyCode.W))
         {
-            ind +=vel;
+            movHero.Translate(0, 0, 1);
         }
         if (Input.GetKey(KeyCode.S))
         {
-            ind -= vel;
+            movHero.Translate(0, 0, -1);
         }
-        return ind;
-    }
-    /// <summary>
-    /// Se utliza para rotar en "y", la camara del heroe
-    /// </summary>
-    /// <param name="vel"></param>
-    /// <returns></returns>
-    public float Rota(float vel)
-    {
-        float ind = 0;
-
         if (Input.GetKey(KeyCode.A))
         {
-            ind += vel;
+            movHero.Rotate(0, -3, 0);
         }
         if (Input.GetKey(KeyCode.D))
         {
-            ind -= vel;
+            movHero.Rotate(0, -3, 0);
         }
-        return ind;
     }
 }
+
 /// <summary>
 /// Se da Toda la funcion de los zombies
 /// </summary>
@@ -110,30 +106,37 @@ public class Zombie
     /// <param name="color">
     /// Se le da un string con los nombres "Cyan, Magenta o Verde", Para darle su color y ademas se crean todas las estancias
     /// </param>
-    public void sombie(string color)
+    public Zombie(string color)
     {
-        GameObject Zesfera = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        Renderer Zrendere = Zesfera.GetComponent<Renderer>();
+
+        GameObject zesfera = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        zesfera.name = "Zombie";
+        Renderer zrendere = zesfera.GetComponent<Renderer>();
         float Rx = Random.Range(-10, 10);
         float Ry = Random.Range(-10, 10);
-        Zesfera.transform.position = new Vector3(Rx, 0, Ry);
+        zesfera.transform.position = new Vector3(Rx, 0, Ry);
         if(color == "Cyan")
         {
-            Zrendere.material.color = Color.cyan;
+            zrendere.material.color = Color.cyan;
         }
         if(color == "Magenta")
         {
-            Zrendere.material.color = Color.magenta;
+            zrendere.material.color = Color.magenta;
         }
         if (color == "Verde")
         {
-            Zrendere.material.color = Color.green;
+            zrendere.material.color = Color.green;
         }
-        Debug.Log("Soy un Zombie de color " + color);
+        Debug.Log(Imprimir("Soy un Zombie de color " + color));
 
+    }
+    string Imprimir(string V)
+    {
+        return V;
     }
 
 }
+
 /// <summary>
 /// Se toma todo lo de los aldeanos
 /// </summary>
@@ -142,19 +145,24 @@ public class Aldeano
     /// <summary>
     /// Es la estancia de todos los aldeano
     /// </summary>
-    /// <param name="Nombre">
+    /// <param name="nombre">
     /// Se da un nombre dentro de un array
     /// </param>
-    /// <param name="Edad">
+    /// <param name="edad">
     /// Se da un nombre dentro de un entero
     /// </param>
-    public void Aldea(string Nombre , int Edad)
+    public Aldeano(string nombre , int edad)
     {
-        GameObject Acube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject acube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        acube.name = nombre;
         float Rx = Random.Range(-10, 10);
         float Ry = Random.Range(-10, 10);
-        Acube.transform.position = new Vector3(Rx, 0, Ry);
-        Debug.Log("Hola Soy " + Nombre + " y tengo " + Edad + " años");
+        acube.transform.position = new Vector3(Rx, 0, Ry);
+        Debug.Log(Imprimir("Hola Soy " + nombre + " y tengo " + edad + " años"));
+    }
+    string Imprimir(string V)
+    {
+        return V;
     }
 }
 
